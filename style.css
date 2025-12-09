@@ -1,0 +1,155 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 60px); 
+}
+
+.sidebar {
+    width: 230px;
+    background: #333;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin: 12px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.sidebar ul li a:hover {
+    text-decoration: underline;
+}
+
+.content {
+    flex: 1;
+    padding: 25px;
+    background: white;
+    min-height: 100%;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.08);
+}
+
+.content h1 {
+    margin-bottom: 12px;
+}
+
+.content hr {
+    margin: 12px 0 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+table th {
+    background: #ececec;
+}
+
+table td img {
+    max-width: 120px;
+    border-radius: 5px;
+}
+
+.btn {
+    padding: 8px 12px;
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background: #007bff;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-warning {
+    background: #ffa500;
+}
+
+.btn-danger {
+    background: #d9534f;
+}
+
+form {
+    margin-top: 15px;
+}
+
+form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="password"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+}
+
+form button,
+form input[type="submit"] {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+form button:hover,
+form input[type="submit"]:hover {
+    background: #0056b3;
+}
+
+footer {
+    height: 60px;
+    padding: 18px;
+    text-align: center;
+    background: #eee;
+    border-top: 1px solid #ccc;
+}
