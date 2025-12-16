@@ -100,6 +100,8 @@ class Form
 ?>
 
 ```
+Class Form.php berfungsi sebagai helper dalam pembuatan elemen form HTML. Class ini membantu pembuatan input, tombol, dan elemen form lainnya secara dinamis sehingga kode menjadi lebih rapi dan terorganisir. Penggunaan class Form juga menunjukkan penerapan konsep OOP dalam pengembangan aplikasi web berbasis PHP.
+
 
 ## database.php
 
@@ -205,6 +207,8 @@ class Database
 }
 ?>
 ```
+Class Database.php dibuat untuk mengelola koneksi dan operasi database menggunakan konsep Object Oriented Programming (OOP). Class ini bertanggung jawab untuk membuka koneksi ke database MySQL serta menyediakan method untuk menjalankan perintah SQL. Dengan memanfaatkan class ini, kode yang berkaitan dengan database menjadi lebih terstruktur, mudah digunakan kembali, dan tidak perlu menuliskan kode koneksi berulang kali di setiap halaman.
+
 
 ## Konfigurasi Dasar (config.php)
 
@@ -219,6 +223,8 @@ $config = [
 ];
 ?>
 ```
+
+File config.php berfungsi sebagai tempat penyimpanan konfigurasi utama aplikasi. Di dalam file ini terdapat pengaturan koneksi database seperti nama host, username, password, dan nama database. Selain itu, file ini juga mendefinisikan konstanta BASE_URL yang digunakan sebagai acuan utama dalam pembuatan link dan pemanggilan asset seperti file CSS. Dengan adanya BASE_URL, seluruh link dalam aplikasi dapat berjalan dengan konsisten meskipun berada pada halaman yang berbeda.
 
 # Tugas Dan Implementasi 
 
@@ -236,6 +242,9 @@ $config = [
     RewriteRule ^(.*)$ index.php?path=$1 [L,QSA]
 </IfModule>
 ```
+
+File .htaccess digunakan untuk mengaktifkan fitur URL rewriting pada web server Apache. Dengan adanya file ini, semua permintaan URL diarahkan ke file index.php tanpa perlu menuliskan nama file PHP secara langsung. Hal ini membuat URL menjadi lebih rapi, mudah dibaca, dan mendukung penerapan sistem routing dalam aplikasi. Penggunaan .htaccess juga membantu menyembunyikan struktur file asli dari pengguna.
+
 
 ## module/artikel/index.php
 ```
@@ -275,6 +284,9 @@ if (!$rows) {
 }
 ?>
 ```
+
+File ini menampilkan daftar seluruh artikel dari database menggunakan class Database. Halaman ini juga menyediakan tombol untuk mengedit dan menghapus data. Modul ini adalah implementasi fitur Read dalam CRUD.
+
 
 ## module/artikel/tambah.php
 
@@ -319,6 +331,8 @@ if ($_POST) {
 
 ```
 
+Halaman ini menampilkan form tambah artikel menggunakan class Form. Setelah form disubmit, data akan disimpan ke tabel artikel melalui fungsi insert pada Database. Modul ini merupakan implementasi operasi Create.
+
 ## module/artikel/hapus.php
 ```
 <?php
@@ -346,6 +360,8 @@ if ($hapus) {
 ?>
 
 ```
+File ini berfungsi untuk menghapus artikel berdasarkan ID. Setelah proses delete selesai, sistem akan mengarahkan kembali ke halaman daftar artikel. Inilah bagian Delete dalam CRUD.
+
 
 ## modules/artikel/ubah.php
 ```
@@ -400,6 +416,8 @@ if ($_POST) {
 </form>
 
 ```
+Halaman untuk mengedit artikel yang sudah ada. Data lama ditampilkan terlebih dahulu pada input form, kemudian disimpan kembali ke database melalui method update. Modul ini merupakan bagian dari Update dalam CRUD.
+
 
 ## header.php
 ```
@@ -455,4 +473,174 @@ if (session_status() === PHP_SESSION_NONE) {
 ```
 
 
-  
+# Autentikasi dan Session
+
+## module/user/login.php 
+```
+<?php
+if (isset($_SESSION['is_login'])) {
+    header('Location: ../home/index');
+    exit;
+}
+
+$message = "";
+
+if ($_POST) {
+    $db = new Database();
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE username='$username' LIMIT 1";
+    $result = $db->query($sql);
+    $data = $result->fetch_assoc();
+
+    if ($data && password_verify($password, $data['password'])) {
+        $_SESSION['is_login'] = true;
+        $_SESSION['username'] = $data['username'];
+        $_SESSION['nama'] = $data['nama'];
+
+        header('Location: ../artikel/index');
+        exit;
+    } else {
+        $message = "Username atau password salah!";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5" style="max-width:400px">
+    <h3 class="text-center">Login User</h3>
+
+    <?php if ($message): ?>
+        <div class="alert alert-danger"><?= $message ?></div>
+    <?php endif; ?>
+
+    <form method="post">
+        <div class="mb-3">
+            <label>Username</label>
+            <input name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button class="btn btn-primary w-100">Login</button>
+    </form>
+</div>
+</body>
+</html>
+```
+
+File module/user/login.php digunakan untuk menampilkan form login serta memproses autentikasi pengguna. Pada file ini, data username dan password yang diinput oleh pengguna akan dicek ke database. Jika proses login berhasil, data pengguna akan disimpan ke dalam session sehingga pengguna dapat mengakses halaman lain yang bersifat private.
+
+![Gambar Login](login.png)
+
+
+## module/user/logout.php 
+
+```
+<?php
+session_destroy();
+header("Location: ../user/login");
+exit;
+```
+
+File module/user/logout.php berfungsi untuk mengakhiri sesi login pengguna. Pada saat logout, session akan dihapus sehingga pengguna tidak lagi memiliki akses ke halaman yang memerlukan autentikasi. Setelah itu, pengguna akan diarahkan kembali ke halaman login.
+
+![Gambar Logout](home.png)
+
+## Tugas Pertemuan 14 
+
+1. Tambahkan fitur "Profil". Buat halaman di module/user/profile.php yang menampilkan data user yang sedang login (Nama, Username) dan form untuk mengubah Password.
+2. Implementasikan logika enkripsi password (password_hash) saat mengubah password di fitur profil tersebut.
+
+Jawaban: 
+
+File module/user/profile.php berfungsi melihat username dan nama serta yerdapat fitur mengubah password. Proses perubahan password dilakukan dengan cara mengenkripsi password baru menggunakan fungsi password_hash() sebelum disimpan ke database. Hal ini bertujuan untuk meningkatkan keamanan data pengguna. 
+
+![Gambar profile](profile.png)
+![Gambar database](password.png)
+
+```
+<?php
+// Proteksi halaman: wajib login
+if (!isset($_SESSION['is_login'])) {
+    header("Location: ../user/login");
+    exit;
+}
+
+$db = new Database();
+$message = "";
+
+// Ambil data user dari session
+$username = $_SESSION['username'];
+$nama     = $_SESSION['nama'];
+
+// Proses ubah password
+if ($_POST) {
+    $password_baru = $_POST['password_baru'];
+    $konfirmasi    = $_POST['konfirmasi_password'];
+
+    if ($password_baru !== $konfirmasi) {
+        $message = "Password dan konfirmasi tidak sama!";
+    } elseif (strlen($password_baru) < 6) {
+        $message = "Password minimal 6 karakter!";
+    } else {
+        // Enkripsi password
+        $hash = password_hash($password_baru, PASSWORD_DEFAULT);
+
+        // Update ke database
+        $sql = "UPDATE users SET password='$hash' WHERE username='$username'";
+        $db->query($sql);
+
+        $message = "Password berhasil diubah!";
+    }
+}
+?>
+
+<h3>Profil User</h3>
+
+<?php if ($message): ?>
+    <p style="color:green"><?= $message ?></p>
+<?php endif; ?>
+
+<form method="post">
+    <div>
+        <label>Username</label><br>
+        <input type="text" value="<?= $username ?>" readonly>
+    </div>
+    <br>
+
+    <div>
+        <label>Nama</label><br>
+        <input type="text" value="<?= $nama ?>" readonly>
+    </div>
+    <br>
+
+    <hr>
+
+    <h4>Ubah Password</h4>
+
+    <div>
+        <label>Password Baru</label><br>
+        <input type="password" name="password_baru" required>
+    </div>
+    <br>
+
+    <div>
+        <label>Konfirmasi Password</label><br>
+        <input type="password" name="konfirmasi_password" required>
+    </div>
+    <br>
+
+    <button type="submit">Simpan</button>
+</form>
+```
+
