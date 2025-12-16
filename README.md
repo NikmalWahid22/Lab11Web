@@ -475,6 +475,106 @@ if (session_status() === PHP_SESSION_NONE) {
 
 # Autentikasi dan Session
 
+## index.php 
+```
+<?php
+session_start(); // WAJIB PALING ATAS
+
+include "config.php";
+include "class/Database.php";
+include "class/Form.php";
+
+$path = $_GET['path'] ?? 'home/index';
+
+if ($path === 'index' || $path === 'index/index') {
+    $path = 'home/index';
+}
+
+$segments = explode('/', trim($path, '/'));
+
+$mod  = $segments[0] ?? 'home';
+$page = $segments[1] ?? 'index';
+
+$public_pages = ['home', 'user'];
+
+if (!in_array($mod, $public_pages)) {
+    if (!isset($_SESSION['is_login'])) {
+        header("Location: user/login");
+        exit;
+    }
+}
+
+$file = "module/{$mod}/{$page}.php";
+
+if (file_exists($file)) {
+    // Login tanpa header
+    if ($mod == 'user' && $page == 'login') {
+        include $file;
+    } else {
+        include "template/header.php";
+        include $file;
+        include "template/footer.php";
+    }
+} else {
+    echo "Halaman tidak ditemukan";
+}
+
+```
+
+## header.php
+```
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab 11 PHP OOP</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="<?= BASE_URL ?>">Lab11</a>
+
+        <!-- INI NAVBAR YANG KAMU KIRIM -->
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>">Home</a>
+            </li>
+
+            <?php if (isset($_SESSION['is_login'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>artikel/index">Artikel</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>user/profile">Profil</a>
+                </li>
+            <?php endif; ?>
+        </ul>
+
+        <ul class="navbar-nav ms-auto">
+            <?php if (isset($_SESSION['is_login'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>user/logout">
+                        Logout (<?= $_SESSION['nama'] ?>)
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>user/login">Login</a>
+                </li>
+            <?php endif; ?>
+        </ul>
+
+    </div>
+</nav>
+
+<div class="container mt-4">
+```
+
+
 ## module/user/login.php 
 ```
 <?php
@@ -566,6 +666,7 @@ Jawaban:
 File module/user/profile.php berfungsi melihat username dan nama serta yerdapat fitur mengubah password. Proses perubahan password dilakukan dengan cara mengenkripsi password baru menggunakan fungsi password_hash() sebelum disimpan ke database. Hal ini bertujuan untuk meningkatkan keamanan data pengguna. 
 
 ![Gambar profile](profile.png)
+![Gambar database](database.png)
 ![Gambar database](password.png)
 
 ```
@@ -579,11 +680,9 @@ if (!isset($_SESSION['is_login'])) {
 $db = new Database();
 $message = "";
 
-// Ambil data user dari session
 $username = $_SESSION['username'];
 $nama     = $_SESSION['nama'];
 
-// Proses ubah password
 if ($_POST) {
     $password_baru = $_POST['password_baru'];
     $konfirmasi    = $_POST['konfirmasi_password'];
